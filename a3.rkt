@@ -1,24 +1,19 @@
 #lang racket
 ;Problem 1
-(define (lex expr env)
-  (cond
-    ((null? expr) '())
-    ((symbol? expr)
-     (if (assoc expr env)
-         (list 'var (cdr (assoc expr env))) 
-         expr))
-    ((list? expr)
-     (let ((first (car expr))
-           (rest (cdr expr)))
-       (cond
-         ((eq? first 'lambda)
-          (let ((param (cadr expr))
-                (body (caddr expr)))
-            (list 'lambda
-                  (lex body (cons (cons param 0)
-                                  (map (lambda (e) (cons (car e) (+ 1 (cdr e)))) env))))))
-         (else
-          (cons (lex first env) (lex rest env))))))))
-  
-;Problem 2
 
+(define index
+  (λ (var ls)
+    (match ls
+      (`() (error "not found"))
+      (`(,a . ,_) #:when (eqv? var a) 0)
+      (`(,_ . ,d) (add1 (index var d))))))
+
+(define lex
+  (λ (exp acc)
+    (match exp
+      (`,y #:when (symbol? y) (index y acc))
+      (`(lambda (,x) ,body)
+       #:when (symbol? x)
+       `(lambda ,(lex body (cons x acc))))
+      (`(,rator ,rand)
+       `(,(lex rator acc) ,(lex rand acc)))))) 
