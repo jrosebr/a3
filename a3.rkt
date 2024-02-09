@@ -38,36 +38,46 @@
 
 ;Problem 2
 
-(define val-of
+(let ([y (* 3 4)])
+      (* y y))
+
+(define value-of
   (λ (e env)
     (match e
       (`,n #:when (number? n) n)
-      (`(+ ,e1 ,e2)
-       (+ (val-of e1 env)
-          (val-of e2 env)))
+      (`(* ,e1 ,e2)
+       (* (value-of e1 env)
+          (value-of e2 env)))
+      (`,n #:when (boolean? n) n)
+      (`(sub1 ,n)
+       (sub1 (value-of n env)))
+      (`(zero? ,n)
+       (zero? (value-of n env)))
+      (`(if ,cond ,then ,else)
+       (if (value-of cond env) (value-of then env) (value-of else env)))
+      (`(let ([,var-name ,var-expression])
+          ,body)
+       (value-of body (extend-env-fn var-name (value-of var-expression env) env)))
       ; Lookup the symbol y in environment
       (`,y #:when (symbol? y)
            (apply-env-fn env y))
       ; Return function
-      (`(λ (,x) ,body)
+      (`(lambda (,x) ,body)
        #:when (symbol? x)
-       (λ (arg)
-         ; We also need to extend the environment
-         (val-of body (extend-env-fn x arg env))))
+       (make-clos-fn x body env))
       ; Application should apply and of course,
       ; natural recursion
       (`(,rator ,rand)
-       ((val-of rator env) (val-of rand env))))))
+       (apply-clos-fn rator rand env)))))
 
-
-(define value-of-fn
-  (λ (x)
-    x))
+(define value-of-fn 
+  (λ (x env)
+    (value-of x (empty-env-fn))))
 
 (define empty-env-fn
   (λ ()
     (λ (y)
-      (error 'val-of "unbound ~a" y))))
+      (error 'value-of "unbound ~a" y))))
 
 (define extend-env-fn
   (λ (x arg env)
@@ -84,8 +94,11 @@
   (λ (x body env)
     (λ (arg)
       ; We also need to extend the environment
-      (val-of body (extend-env-fn x arg env)))))
+      (value-of body (extend-env-fn x arg env)))))
 
+(define apply-clos-fn
+  (λ (rator rand env)
+    ((value-of rator env) (value-of rand env))))
 
 
 (displayln (value-of
