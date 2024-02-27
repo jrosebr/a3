@@ -32,7 +32,7 @@
 ;(lex '(lambda (x) (lambda (x) (y x))) '())
 
 ;Problem 2
-(require racket/trace)
+
 ;Representation Dependent
 (define value-of
   (λ (e env)
@@ -197,6 +197,7 @@
   (λ (rator rand env)
     ((value-of-fn rator env) (value-of-fn rand env))))
 
+#|
 (value-of-fn
    '((lambda (x) (if (zero? x)
                      #t
@@ -235,3 +236,4 @@
         (lambda (n) (if (zero? n) 1 (* n ((f f) (sub1 n)))))))
      5)
    (empty-env-fn))
+|#
