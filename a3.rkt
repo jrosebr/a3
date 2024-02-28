@@ -25,11 +25,11 @@
       (`(,rator ,rand)
        `(,(lex rator acc) ,(lex rand acc))))))
 
-;(lex '(lambda (x) x) '())
-;(lex '(lambda (y) (lambda (x) y)) '())
-;(lex '(lambda (y) (lambda (x) (x y))) '())
-;(lex '(lambda (x) (lambda (x) (x x))) '())
-;(lex '(lambda (x) (lambda (x) (y x))) '())
+(lex '(lambda (x) x) '())
+(lex '(lambda (y) (lambda (x) y)) '())
+(lex '(lambda (y) (lambda (x) (x y))) '())
+(lex '(lambda (x) (lambda (x) (x x))) '())
+(lex '(lambda (x) (lambda (x) (y x))) '())
 
 ;Problem 2
 
